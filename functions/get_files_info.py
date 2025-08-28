@@ -1,22 +1,35 @@
 import os
 
 def get_files_info(working_directory, directory=""):
-    dirs = os.listdir(os.path.abspath(working_directory))
+    dirs = check_and_set_dir(working_directory, directory)
+    #print(dirs)
+    result = f"Result for '{directory}' directory:"
     if directory == ".":
-        dirs = os.listdir(working_directory)
-    if directory not in dirs and directory != ".":
-        return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
-    else:
-        result = "Result for current directory:"
-        current = os.path.abspath(working_directory)
-        print(f"path: {os.path.abspath(working_directory)}")
-        print(f"dirs: {dirs}")
-        #print("Result for current directory:")
-        for file in dirs:
-            abs_file = os.path.join(current, file)
-            size = os.path.getsize(abs_file)
-            is_dir = os.path.isdir(abs_file)
-            print(f"- {file}: file_size={size} bytes, is_dir={is_dir}")
+        result = f"Result for current directory:"
+    for file in os.listdir(dirs):
+        if file.startswith((".", "_")):
+            continue
+        else:
+            current_file = os.path.abspath(os.path.join(dirs, file))
+            size = os.path.getsize(current_file)
+            is_dir = os.path.isdir(current_file)
             result += f"\n- {file}: file_size={size} bytes, is_dir={is_dir}"
-        return result
-            
+    result += f'\nError: '
+    print(result)
+    return result
+
+
+
+def check_and_set_dir(base_dir, directory):
+    local_dirs = os.listdir(base_dir) 
+    if directory == ".":
+        return os.path.abspath(base_dir)
+    if directory not in local_dirs:
+        raise Exception( f'Error: Cannot list "{directory}" as it is outside the permitted working directory')
+    base = os.path.join(base_dir, directory)
+    if not os.path.isdir(base):
+        raise Exception(f'Error: "{directory}" is not a directory')
+    else:
+        return os.path.abspath(base)
+
+
