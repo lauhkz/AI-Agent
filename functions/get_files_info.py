@@ -1,8 +1,8 @@
 import os
+from google.genai import types
 
 def get_files_info(working_directory, directory=""):
     dirs = check_and_set_dir(working_directory, directory)
-    #print(dirs)
     result = f"Result for '{directory}' directory:"
     if directory == ".":
         result = f"Result for current directory:"
@@ -18,8 +18,6 @@ def get_files_info(working_directory, directory=""):
     print(result)
     return result
 
-
-
 def check_and_set_dir(base_dir, directory):
     local_dirs = os.listdir(base_dir) 
     if directory == ".":
@@ -32,4 +30,16 @@ def check_and_set_dir(base_dir, directory):
     else:
         return os.path.abspath(base)
 
-
+schema_get_files_info = types.FunctionDeclaration(
+    name="get_files_info",
+    description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
+            ),
+        },
+    ),
+)
