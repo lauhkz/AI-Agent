@@ -1,6 +1,8 @@
 import os
 import subprocess
 from typing import Text
+from google.genai import types
+
 def run_python_file(working_directory, file_path, args=None):
     abs_working_dir = os.path.abspath(working_directory)
     current = os.path.abspath(os.path.join(working_directory, file_path))
@@ -32,3 +34,22 @@ def run_python_file(working_directory, file_path, args=None):
         return "\n".join(output) if output else "No output produced."
     except Exception as e:
         return f"Error: executing Python file: {e}"
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Execute a python file with arguments if they are provided, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Python file to be executed, has to be in to the working directory.",
+            ),
+            "args": types.Schema(
+                type=types.Type.STRING,
+                description="arguments to be run in the provided python file, if they are not provided only execute the file",
+            ),
+        },
+        required=["file_path"],
+    ),
+)
